@@ -10,13 +10,29 @@ def main() -> None:
     parser.add_argument(
         "--output",
         metavar="FILE",
-        help="Export result to JSONN file (e.g. --output result.json)",
+        help="Export result to JSON file (e.g. --output result.json)",
+    )
+    parser.add_argument(
+    "--columns",
+    metavar="COLS",
+    help="Columns to analyze, comma-separated (e.g. --columns age,salary)",
     )
     args = parser.parse_args()
     
     try:
         headers, rows = read_csv(args.filepath)
+        
+        if args.columns:
+            selected = [c.strip() for c in args.columns.split(",")]
+            invalid = [c for c in selected if c not in headers]
+            if invalid:
+                print(f"Error: columns not found: {', '.join(invalid)}")
+                print(f"Available: {', '.join(headers)}")
+                return
+            headers = selected
+            
         result = analyze(headers, rows, filename=Path(args.filepath).name)
+        
     except CSVReadError as e:
         print(f"Error: {e}")
         return

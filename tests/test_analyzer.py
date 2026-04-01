@@ -41,3 +41,17 @@ def test_detects_outlier():
     result = analyze(headers, rows)
     assert 999.0 in result.columns[0].outliers
     assert result.columns[0].outlier_count == 1
+    
+def test_analyze_specific_columns():
+    headers = ["name", "age", "salary"]
+    rows = [
+        {"name": "Alice", "age": "30", "salary": "70000"},
+        {"name": "Bob", "age": "25", "salary": "50000"},
+        {"name": "Charlie", "age": "", "salary": "60000"},
+    ]
+    selected = [h for h in headers if h in ["age", "salary"]]
+    result = analyze(selected, rows)
+    
+    assert result.col_count == 2
+    assert result.columns[0].name == "age"
+    assert result.columns[1].name == "salary"
